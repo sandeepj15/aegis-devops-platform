@@ -8,8 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    # Update repoURL with your GitHub repository once created
-    repoURL: https://github.com/REPLACE_WITH_YOUR_GITHUB_USER/aegis-devops-platform.git
+    repoURL: https://github.com/sandeepj15/aegis-devops-platform.git
     targetRevision: main
     path: k8s
   destination:
