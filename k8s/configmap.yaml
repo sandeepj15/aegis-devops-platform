@@ -9,6 +9,6 @@ metadata:
 data:
   APP_NAME: "Aegis API"
   APP_ENV: "production"
-  APP_MESSAGE: "Hello from Aegis DevOps Platform running on Kubernetes!"
+  APP_MESSAGE: "Hello from Aegis DevOps Platform — Version 2.0 Live via GitOps!"
   LOG_LEVEL: "INFO"
   PORT: "8000"
