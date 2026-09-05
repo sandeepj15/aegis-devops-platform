@@ -1,8 +1,7 @@
 import subprocess
-from typing import Dict, Optional
 
 
-def get_pod_logs(pod_name: str, namespace: str = "aegis", tail_lines: int = 50) -> Dict[str, str]:
+def get_pod_logs(pod_name: str, namespace: str = "aegis", tail_lines: int = 50) -> dict[str, str]:
     """Retrieves stdout/stderr log output from a Kubernetes pod."""
     cmd = ["kubectl", "logs", pod_name, "-n", namespace, f"--tail={tail_lines}"]
     try:

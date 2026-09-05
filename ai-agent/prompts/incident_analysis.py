@@ -1,6 +1,7 @@
 """Incident investigation prompt templates and correlation heuristics."""
 
-SYSTEM_PROMPT = """You are Aegis AI, an advanced Site Reliability Engineering (SRE) and DevOps diagnostic agent.
+SYSTEM_PROMPT = """You are Aegis AI, an advanced Site Reliability Engineering (SRE)
+and DevOps diagnostic agent.
 Your responsibility is:
 1. OBSERVE: Review Kubernetes pod statuses, container exit codes, logs, warning events, and metrics.
 2. ANALYZE: Correlate symptoms across system boundaries to pinpoint the root cause.
@@ -29,9 +30,12 @@ def format_evidence_payload(
     metrics: dict,
 ) -> str:
     """Formats raw system telemetry into structured evidence for diagnosis."""
+    desired = deployment.get("desired_replicas")
+    ready = deployment.get("ready_replicas")
+    available = deployment.get("available_replicas")
     return f"""--- TELEMETRY SNAPSHOT ---
 Deployment: {deployment.get('name', 'N/A')}
-Replicas: Desired={deployment.get('desired_replicas')}, Ready={deployment.get('ready_replicas')}, Available={deployment.get('available_replicas')}
+Replicas: Desired={desired}, Ready={ready}, Available={available}
 
 Pods Status:
 {pods}

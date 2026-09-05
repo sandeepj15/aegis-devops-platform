@@ -1,9 +1,9 @@
 import json
 import subprocess
-from typing import Any, Dict, List
+from typing import Any
 
 
-def get_k8s_events(namespace: str = "aegis") -> List[Dict[str, Any]]:
+def get_k8s_events(namespace: str = "aegis") -> list[dict[str, Any]]:
     """Retrieves cluster events in a namespace sorted by recency."""
     cmd = ["kubectl", "get", "events", "-n", namespace, "-o", "json"]
     try:

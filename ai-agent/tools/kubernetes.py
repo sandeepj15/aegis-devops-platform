@@ -1,9 +1,9 @@
 import json
 import subprocess
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 
-def _run_kubectl(args: List[str]) -> Dict[str, Any]:
+def _run_kubectl(args: list[str]) -> dict[str, Any]:
     """Helper to run kubectl and return parsed JSON output."""
     cmd = ["kubectl"] + args + ["-o", "json"]
     try:
@@ -15,7 +15,9 @@ def _run_kubectl(args: List[str]) -> Dict[str, Any]:
         return {"error": str(e)}
 
 
-def get_pod_status(namespace: str = "aegis", selector: Optional[str] = None) -> List[Dict[str, Any]]:
+def get_pod_status(
+    namespace: str = "aegis", selector: Optional[str] = None
+) -> list[dict[str, Any]]:
     """Retrieves detailed status of pods in a namespace, optionally filtered by label selector."""
     args = ["get", "pods", "-n", namespace]
     if selector:
@@ -53,7 +55,7 @@ def get_pod_status(namespace: str = "aegis", selector: Optional[str] = None) -> 
     return pods_summary
 
 
-def get_deployment(name: str = "aegis-api", namespace: str = "aegis") -> Dict[str, Any]:
+def get_deployment(name: str = "aegis-api", namespace: str = "aegis") -> dict[str, Any]:
     """Retrieves deployment specification and operational status."""
     data = _run_kubectl(["get", "deployment", name, "-n", namespace])
     if "error" in data:
@@ -85,7 +87,7 @@ def get_deployment(name: str = "aegis-api", namespace: str = "aegis") -> Dict[st
     }
 
 
-def get_service(name: str = "aegis-service", namespace: str = "aegis") -> Dict[str, Any]:
+def get_service(name: str = "aegis-service", namespace: str = "aegis") -> dict[str, Any]:
     """Retrieves service configuration and endpoint mapping."""
     data = _run_kubectl(["get", "service", name, "-n", namespace])
     if "error" in data:

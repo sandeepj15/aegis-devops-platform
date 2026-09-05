@@ -3,16 +3,15 @@
 
 import os
 import sys
-from typing import Any, Dict, List
+from typing import Any
 
 # Ensure local package imports work
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from tools.events import get_k8s_events
-from tools.kubernetes import get_deployment, get_pod_status, get_service
+from tools.kubernetes import get_deployment, get_pod_status
 from tools.logs import get_pod_logs
 from tools.metrics import get_metrics
-from prompts.incident_analysis import SYSTEM_PROMPT, format_evidence_payload
 
 
 class AegisAIAgent:
@@ -22,25 +21,25 @@ class AegisAIAgent:
         self.namespace = namespace
         self.deployment_name = deployment_name
 
-    def collect_telemetry(self) -> Dict[str, Any]:
+    def collect_telemetry(self) -> dict[str, Any]:
         """Gathers diagnostic data from all observability and cluster surfaces."""
-        print(f"[*] Inspecting Pod status for '{self.deployment_name}' in namespace '{self.namespace}'...")
+        print(f"[*] Inspecting Pod status for '{self.deployment_name}' in '{self.namespace}'...")
         pods = get_pod_status(self.namespace, selector=f"app={self.deployment_name}")
 
         print(f"[*] Inspecting Deployment '{self.deployment_name}'...")
         deployment = get_deployment(self.deployment_name, self.namespace)
 
-        print(f"[*] Inspecting Kubernetes cluster events...")
+        print("[*] Inspecting Kubernetes cluster events...")
         events = get_k8s_events(self.namespace)
 
-        print(f"[*] Reading pod logs...")
+        print("[*] Reading pod logs...")
         logs = []
         for pod in pods:
             name = pod.get("name")
             if name:
                 logs.append(get_pod_logs(name, self.namespace, tail_lines=30))
 
-        print(f"[*] Checking telemetry metrics...")
+        print("[*] Checking telemetry metrics...")
         metrics = get_metrics("http_requests_total")
 
         return {
@@ -51,17 +50,15 @@ class AegisAIAgent:
             "metrics": metrics,
         }
 
-    def correlate_and_analyze(self, telemetry: Dict[str, Any]) -> str:
+    def correlate_and_analyze(self, telemetry: dict[str, Any]) -> str:
         """Analyzes symptoms to derive probable root cause and safe remediation."""
         pods = telemetry["pods"]
-        events = telemetry["events"]
         logs = telemetry["logs"]
         deployment = telemetry["deployment"]
 
         # Check for pod failures or probe warnings
         unready_pods = [p for p in pods if not p.get("is_ready") and p.get("phase") == "Running"]
         crashing_pods = [p for p in pods if p.get("restart_count", 0) > 0]
-        failed_pods = [p for p in pods if p.get("phase") in ["Failed", "CrashLoopBackOff"]]
 
         # Scenario 1: Readiness probe failure
         if unready_pods and not crashing_pods:
@@ -82,8 +79,9 @@ class AegisAIAgent:
             )
 
         # Scenario 2: Missing environment variable or crashloop
-        log_text = " ".join(l.get("logs", "") for l in logs)
-        if "DATABASE_URL" in log_text and ("missing" in log_text.lower() or "error" in log_text.lower()):
+        log_text = " ".join(item.get("logs", "") for item in logs if item.get("logs"))
+        has_db_error = "missing" in log_text.lower() or "error" in log_text.lower()
+        if "DATABASE_URL" in log_text and has_db_error:
             return (
                 "Incident Analysis\n"
                 "────────────────────────────────────────────────────────────\n"
@@ -99,7 +97,9 @@ class AegisAIAgent:
             )
 
         # Scenario 3: Healthy operational state
-        if all(p.get("is_ready") for p in pods) and deployment.get("ready_replicas", 0) > 0:
+        desired_rep = deployment.get("desired_replicas")
+        ready_rep = deployment.get("ready_replicas")
+        if all(p.get("is_ready") for p in pods) and (ready_rep or 0) > 0:
             return (
                 "Incident Analysis\n"
                 "────────────────────────────────────────────────────────────\n"
@@ -107,7 +107,7 @@ class AegisAIAgent:
                 "Root Cause: System is operating normally within healthy SLO boundaries.\n"
                 "Evidence:\n"
                 f"  • All {len(pods)} pod(s) are in Ready state (1/1 Running).\n"
-                f"  • Desired replicas ({deployment.get('desired_replicas')}) match ready replicas ({deployment.get('ready_replicas')}).\n"
+                f"  • Desired replicas ({desired_rep}) match ready replicas ({ready_rep}).\n"
                 "  • Zero restarts recorded across the deployment.\n"
                 "  • Service endpoints active and healthy.\n"
                 "Recommended Action: No remediation required.\n"
