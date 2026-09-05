@@ -24,7 +24,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -78,7 +78,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum by (endpoint, status_code) (rate(http_requests_total[1m]))",
@@ -91,7 +91,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -125,7 +125,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[1m])))",
@@ -136,7 +136,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket[1m])))",
@@ -161,7 +161,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "P8E80F9AEF21F6940"
+        "uid": "loki"
       },
       "gridPos": {
         "h": 14,
@@ -185,7 +185,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "P8E80F9AEF21F6940"
+            "uid": "loki"
           },
           "editorMode": "code",
           "expr": "{container=\"aegis-api\"}",
