@@ -1,0 +1,20 @@
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+]
+ignore = [
+    "B008", # Do not perform function call in argument defaults (standard in FastAPI for Depends)
+    "UP017", # Use datetime.UTC (requires Python 3.11+)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
